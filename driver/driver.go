@@ -28,12 +28,6 @@ type dbConfig struct {
 
 var dbc dbConfig
 
-func logFatal(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func ConnectDB() *sql.DB {
 	err := envconfig.Process("PG", &dbc)
 	if err != nil {
