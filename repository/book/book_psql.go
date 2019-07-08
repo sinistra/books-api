@@ -8,7 +8,7 @@ import (
 type BookRepository struct{}
 
 func (b BookRepository) GetBooks(db *sql.DB, book models.Book, books []models.Book) ([]models.Book, error) {
-	rows, err := db.Query("select * from books")
+	rows, err := db.Query("select * from books order by id")
 
 	if err != nil {
 		return []models.Book{}, err
