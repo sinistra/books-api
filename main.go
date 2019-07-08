@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
+	"os"
 
 	"sinistra/books-api/controllers"
 	"sinistra/books-api/driver"
@@ -16,12 +17,19 @@ import (
 
 var books []models.Book
 var db *sql.DB
+var port string
 
 func init() {
 	godotenv.Load()
+	var ok bool
+	port, ok = os.LookupEnv("HOST_PORT")
+	if !ok {
+		port = "8000"
+	}
 }
 
 func main() {
+	//log.Println("Port="+port)
 	db = driver.ConnectDB()
 	controller := controllers.Controller{}
 
@@ -33,6 +41,7 @@ func main() {
 	router.HandleFunc("/books", controller.UpdateBook(db)).Methods("PUT")
 	router.HandleFunc("/books/{id}", controller.RemoveBook(db)).Methods("DELETE")
 
-	fmt.Println("Server is running at port 8000")
-	log.Fatal(http.ListenAndServe(":8000", router))
+	fmt.Println("Server is running at port " + port)
+	address := ":" + port
+	log.Fatal(http.ListenAndServe(address, router))
 }
