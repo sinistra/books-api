@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/urfave/negroni"
 	"log"
 	"net/http"
 	"os"
@@ -41,7 +42,20 @@ func main() {
 	router.HandleFunc("/books", controller.UpdateBook(db)).Methods("PUT")
 	router.HandleFunc("/books/{id}", controller.RemoveBook(db)).Methods("DELETE")
 
+	router.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		panic("oh no")
+	})
+
+	n := negroni.New()
+
+	recovery := negroni.NewRecovery()
+	recovery.Formatter = &negroni.HTMLPanicFormatter{}
+
+	n.Use(recovery)
+	n.Use(negroni.NewLogger())
+	n.UseHandler(router)
+
 	fmt.Println("Server is running at port " + port)
 	address := ":" + port
-	log.Fatal(http.ListenAndServe(address, router))
+	log.Fatal(http.ListenAndServe(address, n))
 }
