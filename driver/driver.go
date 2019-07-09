@@ -45,6 +45,9 @@ func ConnectDB() *sql.DB {
 		log.Fatal(err.Error())
 	}
 
+	// calling db.Close will close immediately this function returns, even though db is in the return.
+	//defer db.Close()
+
 	err = db.Ping()
 	if err != nil {
 		log.Fatal(err.Error())

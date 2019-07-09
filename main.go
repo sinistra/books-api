@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/urfave/negroni"
+	"gopkg.in/tylerb/graceful.v1"
 	"log"
 	"net/http"
 	"os"
-
 	"sinistra/books-api/controllers"
 	"sinistra/books-api/driver"
 	"sinistra/books-api/models"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -32,6 +33,7 @@ func init() {
 func main() {
 	//log.Println("Port="+port)
 	db = driver.ConnectDB()
+	defer db.Close()
 	controller := controllers.Controller{}
 
 	router := mux.NewRouter()
@@ -57,5 +59,15 @@ func main() {
 
 	fmt.Println("Server is running at port " + port)
 	address := ":" + port
-	log.Fatal(http.ListenAndServe(address, n))
+
+	srv := &graceful.Server{
+		Timeout: 10 * time.Second,
+
+		Server: &http.Server{
+			Addr:    address,
+			Handler: n,
+		},
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }
