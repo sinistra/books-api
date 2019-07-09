@@ -1,8 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/urfave/negroni"
 	"gopkg.in/tylerb/graceful.v1"
@@ -18,7 +18,7 @@ import (
 )
 
 var books []models.Book
-var db *sql.DB
+var db *sqlx.DB
 var port string
 
 func init() {
