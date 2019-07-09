@@ -3,6 +3,7 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/jmoiron/sqlx"
 	"net/http"
 	"sinistra/books-api/models"
 	"sinistra/books-api/repository/book"
@@ -16,14 +17,13 @@ type Controller struct{}
 
 var books []models.Book
 
-func (c Controller) GetBooks(db *sql.DB) http.HandlerFunc {
+func (c Controller) GetBooks(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var book models.Book
 		var error models.Error
 
 		books = []models.Book{}
 		bookRepo := bookRepository.BookRepository{}
-		books, err := bookRepo.GetBooks(db, book, books)
+		books, err := bookRepo.GetBooks(db, books)
 
 		if err != nil {
 			error.Message = "Server error"
@@ -36,14 +36,13 @@ func (c Controller) GetBooks(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func (c Controller) GetBook(db *sql.DB) http.HandlerFunc {
+func (c Controller) GetBook(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book models.Book
 		var error models.Error
 
 		params := mux.Vars(r)
 
-		books = []models.Book{}
 		bookRepo := bookRepository.BookRepository{}
 
 		id, _ := strconv.Atoi(params["id"])
@@ -67,7 +66,7 @@ func (c Controller) GetBook(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
+func (c Controller) AddBook(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book models.Book
 		var bookID int
@@ -95,7 +94,7 @@ func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
+func (c Controller) UpdateBook(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book models.Book
 		var error models.Error
@@ -122,7 +121,7 @@ func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func (c Controller) RemoveBook(db *sql.DB) http.HandlerFunc {
+func (c Controller) RemoveBook(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var error models.Error
 		params := mux.Vars(r)
